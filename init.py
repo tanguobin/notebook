@@ -4,8 +4,6 @@
 
 import os
 import sys
-import uuid
-import base64
 import tornado.web
 import tornado.httpserver
 import tornado.ioloop
@@ -22,8 +20,7 @@ class Application(tornado.web.Application):
     def __init__(self):
         settings = {
             'static_path': os.path.join(options.project_path, 'static'),
-            'cookie_secret': base64.b64encode(uuid.uuid4().bytes + uuid.uuid4().bytes),
-            'xsrf_cookies': True,
+            'xsrf_cookies': False,
             'debug': options.debug,
             'gzip': True,
         }
@@ -34,8 +31,10 @@ class Application(tornado.web.Application):
             (r'/category', 'handler.note.CategoryHandler'),
             (r'/notebook', 'handler.note.NotebookHandler'),
             (r'/updatenote', 'handler.note.UpdateNoteHandler'),
+            (r'/updatecate', 'handler.note.UpdateCateHandler'),
             (r'/rm', 'handler.note.RemoveHandler'),
             (r'/upload', 'handler.note.ImageHandler'),
+            (r'/.*', 'handler.base.BaseHandler'),
         ], **settings)
 
 def free_resource():
@@ -44,6 +43,7 @@ def free_resource():
 
 if __name__ == "__main__":
     add_reload_hook(free_resource)
-    http_server = tornado.httpserver.HTTPServer(Application())
+    application = Application()
+    http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(options.port)
     tornado.ioloop.IOLoop.instance().start()
