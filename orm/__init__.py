@@ -6,6 +6,7 @@ import sys
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
+from tornado.ioloop import PeriodicCallback
 
 from conf import config
 
@@ -32,10 +33,16 @@ class ORM(object):
         passwd = config.get('DB_NOTE', 'passwd')
 
         mysql = 'mysql://%s:%s@%s:%s/%s?charset=utf8'%(user,passwd,host,port,db)
-        self.engine = create_engine(mysql,pool_recycle=7200,echo=True)
+        self.engine = create_engine(mysql,echo=True)
         print '--->init db:%s' % mysql
-        Session = sessionmaker(bind=self.engine,autocommit=True)
+        Session = sessionmaker(bind=self.engine)
         self.session = Session()
+        self.ping()
+        PeriodicCallback(self.ping, 3600*1000).start()
+
+    def ping(self):
+        self.session.execute('set names utf8')
+        self.session.execute('set autocommit=1')
 
     def __del__(self):
         self.close()

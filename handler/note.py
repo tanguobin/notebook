@@ -3,6 +3,7 @@
 # vim: set et sw=4 ts=4 sts=4 ff=unix fenc=utf8:
 
 import logging
+import hashlib
 from handler.base import BaseHandler
 from control import ctrl
 
@@ -59,7 +60,7 @@ class NotebookHandler(BaseHandler):
             note = ctrl.note.get_note_detail(nid)
             images,title,content = [],'',''
             if note:
-                images = note.images.split('|')
+                images = [self.application.settings['static_host']+image for image in note.images.split('&') if image]
                 title = note.title
                 content = note.content
             result = {
@@ -73,7 +74,7 @@ class NotebookHandler(BaseHandler):
         self.send_json(result, code)
 
 class UpdateNoteHandler(BaseHandler):
-    def post(self):
+    def get(self):
         result,code = {},'E_OK'
         u = self.current_user
         if not u:
@@ -109,7 +110,38 @@ class UpdateNoteHandler(BaseHandler):
         self.send_json(result, code)
 
 class UpdateCateHandler(BaseHandler):
-    pass
+    def post(self):
+        result,code = {},'E_OK'
+        u = self.current_user
+        if not u:
+            code = 'E_AUTH'
+            self.send_json(result, code)
+            return
+        cid = self.get_argument('cid','')
+        name = self.get_argument('name','')
+        if not name:
+            code = 'E_PARAM'
+            self.send_json(result, code)
+            return
+        try:
+            if cid:
+                ctrl.note.update_category(id=cid,uid=u['uid'],name=name)
+                result = {
+                    'success': 1
+                }
+            else:
+                category = ctrl.note.add_category(uid=u['uid'],names=[name])[0]
+                result = {
+                    'success': 1,
+                    'cid': category.id
+                }
+        except Exception,e:
+            logger.exception("%s\n%s\n", self.request, e)
+            code = 'E_INTER'
+            result = {
+                'success': 0
+            }
+        self.send_json(result, code)
 
 class RemoveHandler(BaseHandler):
     def get(self):
@@ -142,4 +174,31 @@ class RemoveHandler(BaseHandler):
         self.send_json(result, code)
 
 class ImageHandler(BaseHandler):
-    pass
+    def post(self):
+        result,code = {},'E_OK'
+        u = self.current_user
+        if not u:
+            code = 'E_AUTH'
+            self.send_json(result, code)
+            return
+        try:
+            nid = int(self.get_argument('nid'))
+            all_files = self.request.files['file']
+            urllist = []
+            for upload_file in all_files:
+                md5_sign = hashlib.md5(upload_file['body'])
+                sign = md5_sign.hexdigest() + '.jpg'
+                static_path = self.application.settings['static_path']
+                file_path = '/'.join([static_path, sign])
+                fopen = open(file_path, 'wb')
+                fopen.write(upload_file['body'])
+                fopen.close()
+                urllist.append(sign)
+            result['url'] = urllist
+            images = '&'.join(urllist)
+            if images:
+                ctrl.note.update_note(id=nid,images=images)
+        except Exception,e:
+            logger.exception("%s\n%s\n", self.request, e)
+            code = 'E_INTER'
+        self.send_json(result, code)

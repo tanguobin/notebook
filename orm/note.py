@@ -5,6 +5,8 @@
 from sqlalchemy import Column, text
 from sqlalchemy.dialects.mysql import DATETIME, INTEGER, TIMESTAMP, VARCHAR, TEXT
 from sqlalchemy.sql.expression import func
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.schema import UniqueConstraint
 from orm import Base, orm
 
 class Notebook(Base):
@@ -19,6 +21,13 @@ class Notebook(Base):
     creatime = Column(DATETIME, nullable=False, default=func.now())
     uptime = Column(TIMESTAMP, nullable=False, server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
 
+    @declared_attr
+    def __table_args__(cls):
+        return (
+            UniqueConstraint('uid', 'cid', 'title', name='uid_cid_title'),
+            Base.__table_args__
+        )
+
 class Category(Base):
 
     # column
@@ -27,6 +36,13 @@ class Category(Base):
     name = Column(VARCHAR(64), nullable=False, server_default='')
     creatime = Column(DATETIME, nullable=False, default=func.now())
     uptime = Column(TIMESTAMP, nullable=False, server_default=text('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'))
+
+    @declared_attr
+    def __table_args__(cls):
+        return (
+            UniqueConstraint('uid', 'name', name='uid_name'),
+            Base.__table_args__
+        )
 
 class NoteModel(object):
 
@@ -53,7 +69,8 @@ class NoteModel(object):
             'uid': Notebook.uid,
             'cid': Notebook.cid,
             'title': Notebook.title,
-            'content': Notebook.content
+            'content': Notebook.content,
+            'images': Notebook.images
         }
         attr = {}
         for k in args:
@@ -62,15 +79,30 @@ class NoteModel(object):
         self.session.commit()
         return True
 
+    def update_category(self,id=None,**args):
+        mapping = {
+            'id': Category.id,
+            'uid': Category.uid,
+            'name': Category.name
+        }
+        attr = {}
+        for k in args:
+            attr[mapping[k]] = args[k]
+        self.session.query(Category).filter(Category.id==id).update(attr)
+        self.session.commit()
+        return True
+
     def add_category(self,uid=None,names=None):
         '''
         batch adding category
         '''
+        catelist = []
         for name in names:
             cate = Category(uid=uid,name=name)
             self.session.add(cate)
+            catelist.append(cate)
         self.session.commit()
-        return True
+        return catelist
 
     def get_category(self,uid=None):
         '''
