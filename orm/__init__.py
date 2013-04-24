@@ -43,6 +43,7 @@ class ORM(object):
     def ping(self):
         self.session.execute('set names utf8')
         self.session.execute('set autocommit=1')
+        self.session.commit()
 
     def __del__(self):
         self.close()
