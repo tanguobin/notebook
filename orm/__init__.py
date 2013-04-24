@@ -4,7 +4,7 @@
 
 import sys
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker,scoped_session
 from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from tornado.ioloop import PeriodicCallback
 
@@ -35,7 +35,7 @@ class ORM(object):
         mysql = 'mysql://%s:%s@%s:%s/%s?charset=utf8'%(user,passwd,host,port,db)
         self.engine = create_engine(mysql,echo=True)
         print '--->init db:%s' % mysql
-        Session = sessionmaker(bind=self.engine)
+        Session = scoped_session(sessionmaker(bind=self.engine))
         self.session = Session()
         self.ping()
         PeriodicCallback(self.ping, 3600*1000).start()
