@@ -42,7 +42,7 @@ class BaseHandler(tornado.web.RequestHandler):
     def gen_session_id(self, secret):
         return hashlib.sha1("%s%s%s" % (uuid.uuid4(), time.time(), secret)).hexdigest()
 
-    def set_session_id(self, expires=0):
+    def get_session_id(self, expires=0):
         cookie_name = config.get('SESSION', 'cookie_name')
         secret = config.get('SESSION', 'secret')
         if expires:
@@ -51,18 +51,24 @@ class BaseHandler(tornado.web.RequestHandler):
         self.set_cookie(cookie_name, session_id, expires=expires)
         return session_id
 
-    def delete_session_id(self):
+    def get_session(self):
+        '''
+        get session
+        '''
         cookie_name = config.get('SESSION', 'cookie_name')
         session_id = self.get_cookie(cookie_name)
-        ctrl.session.delete(session_id)
-        self.set_cookie(cookie_name, '')
+        session = ctrl.session.get(str(session_id))
+        return session
 
-    def get_session_id(self):
+    def delete_session(self):
+        '''
+        delete session
+        '''
         cookie_name = config.get('SESSION', 'cookie_name')
         session_id = self.get_cookie(cookie_name)
-        return str(session_id)
+        if session_id:
+            ctrl.session.delete(session_id)
+        self.clear_cookie(cookie_name)
 
     def get_current_user(self):
-        session_id = self.get_session_id()
-        session = ctrl.session.get(session_id)
-        return session
+        return self.get_session()
