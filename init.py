@@ -23,7 +23,7 @@ class Application(tornado.web.Application):
             'xsrf_cookies': False,
             'debug': options.debug,
             'gzip': True,
-            'static_host': 'http://124.127.188.83:' + str(options.port) + '/static/',
+            'static_host': 'http://api1.enote.ctyun.cn/static/',
         }
         tornado.web.Application.__init__(self, [
             (r'/login/oauth_redirect', 'handler.user.LoginHandler'),
