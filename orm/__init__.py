@@ -33,7 +33,7 @@ class ORM(object):
         passwd = config.get('DB_NOTE', 'passwd')
 
         mysql = 'mysql://%s:%s@%s:%s/%s?charset=utf8'%(user,passwd,host,port,db)
-        self.engine = create_engine(mysql,echo=True)
+        self.engine = create_engine(mysql)
         print '--->init db:%s' % mysql
         Session = scoped_session(sessionmaker(bind=self.engine))
         self.session = Session()
