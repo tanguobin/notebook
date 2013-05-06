@@ -9,7 +9,7 @@ from conf import config
 class LoginHandler(BaseHandler):
     def get(self):
         u = self.current_user
-        result, code = {}, 'E_OK'
+        result, code = [], 'E_OK'
         if u:
             self.send_json(result, code)
             return
@@ -36,7 +36,7 @@ class LogoutHandler(BaseHandler):
 class UserHandler(BaseHandler):
     def get(self):
         u = self.current_user
-        result, code = {}, 'E_OK'
+        result, code = [], 'E_OK'
         if u:
             result = {
                 'isLogin': 1,

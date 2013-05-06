@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 class CategoryHandler(BaseHandler):
     def get(self):
-        result,code = {},'E_OK'
+        result,code = [],'E_OK'
         u = self.current_user
         if not u:
             code = 'E_AUTH'
@@ -41,7 +41,7 @@ class CategoryHandler(BaseHandler):
 
 class NotebookHandler(BaseHandler):
     def get(self):
-        result,code = {},'E_OK'
+        result,code = [],'E_OK'
         u = self.current_user
         if not u:
             code = 'E_AUTH'
@@ -67,7 +67,7 @@ class NotebookHandler(BaseHandler):
 
 class UpdateNoteHandler(BaseHandler):
     def get(self):
-        result,code = {},'E_OK'
+        result,code = [],'E_OK'
         u = self.current_user
         if not u:
             code = 'E_AUTH'
@@ -98,7 +98,7 @@ class UpdateNoteHandler(BaseHandler):
 
 class UpdateCateHandler(BaseHandler):
     def post(self):
-        result,code = {},'E_OK'
+        result,code = [],'E_OK'
         u = self.current_user
         if not u:
             code = 'E_AUTH'
@@ -125,7 +125,7 @@ class UpdateCateHandler(BaseHandler):
 
 class RemoveHandler(BaseHandler):
     def get(self):
-        result,code = {},'E_OK'
+        result,code = [],'E_OK'
         u = self.current_user
         if not u:
             code = 'E_AUTH'
@@ -149,7 +149,7 @@ class RemoveHandler(BaseHandler):
 
 class ImageHandler(BaseHandler):
     def post(self):
-        result,code = {},'E_OK'
+        result,code = [],'E_OK'
         u = self.current_user
         if not u:
             code = 'E_AUTH'
@@ -168,7 +168,9 @@ class ImageHandler(BaseHandler):
                 fopen.write(upload_file['body'])
                 fopen.close()
                 urllist.append(sign)
-            result['url'] = urllist
+            result = {
+                'url': urllist
+            }
             images = '&'.join(urllist)
             if images:
                 ctrl.note.update_note(id=nid,images=images)
