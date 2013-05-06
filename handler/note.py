@@ -22,7 +22,6 @@ class CategoryHandler(BaseHandler):
         psize = self.get_argument('psize', 20)
         if cid:
             notes = ctrl.note.get_all_note(uid=u['uid'],cid=cid)
-            total = len(notes)
             notelist = []
             for note in notes:
                 notelist.append({
@@ -30,21 +29,14 @@ class CategoryHandler(BaseHandler):
                     'title':note.title,
                     'time':note.uptime.strftime('%Y-%m-%d %H:%M:%S')
                 })
-            result = {
-                'total': total,
-                'notelist': notelist
-            }
+            result = notelist
         else:
             cates = ctrl.note.get_category(uid=u['uid'])
-            total = len(cates)
             catelist = []
             for cate in cates:
                 count = ctrl.note.get_note_count(uid=u['uid'],cid=cate.id)
                 catelist.append({'cid':cate.id,'name':cate.name,'count':count})
-            result = {
-                'total': total,
-                'catelist': catelist
-            }
+            result = catelist
         self.send_json(result, code)
 
 class NotebookHandler(BaseHandler):
@@ -91,22 +83,17 @@ class UpdateNoteHandler(BaseHandler):
                 note = ctrl.note.get_note_detail(nid)
                 if note:
                     result = {
-                        'success': 1,
                         'time': note.uptime.strftime('%Y-%m-%d %H:%M:%S')
                     }
             else:
                 note = ctrl.note.add_notebook(u['uid'],cid,title,content)
                 result = {
-                    'success': 1,
                     'nid': note.id,
                     'time': note.uptime.strftime('%Y-%m-%d %H:%M:%S')
                 }
         except Exception,e:
             logger.exception("%s\n%s\n", self.request, e)
             code = 'E_PARAM'
-            result = {
-                'success': 0
-            }
         self.send_json(result, code)
 
 class UpdateCateHandler(BaseHandler):
@@ -126,21 +113,14 @@ class UpdateCateHandler(BaseHandler):
         try:
             if cid:
                 ctrl.note.update_category(id=cid,uid=u['uid'],name=name)
-                result = {
-                    'success': 1
-                }
             else:
                 category = ctrl.note.add_category(uid=u['uid'],names=[name])[0]
                 result = {
-                    'success': 1,
                     'cid': category.id
                 }
         except Exception,e:
             logger.exception("%s\n%s\n", self.request, e)
             code = 'E_INTER'
-            result = {
-                'success': 0
-            }
         self.send_json(result, code)
 
 class RemoveHandler(BaseHandler):
@@ -162,15 +142,9 @@ class RemoveHandler(BaseHandler):
                 ctrl.note.delete_note(id=nid)
             if cid:
                 ctrl.note.delete_note(cid=cid)
-            result = {
-                'success': 1
-            }
         except Exception,e:
             logger.exception("%s\n%s\n", self.request, e)
             code = 'E_INTER'
-            result = {
-                'success': 0
-            }
         self.send_json(result, code)
 
 class ImageHandler(BaseHandler):
