@@ -18,8 +18,6 @@ class CategoryHandler(BaseHandler):
             self.send_json(result, code)
             return
         cid = self.get_argument('cid', '')
-        p = self.get_argument('p', 0)
-        psize = self.get_argument('psize', 20)
         if cid:
             notes = ctrl.note.get_all_note(uid=u['uid'],cid=cid)
             notelist = []
