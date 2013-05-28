@@ -41,8 +41,7 @@ class UserHandler(BaseHandler):
         result, code = [], 'E_OK'
         if u:
             result = {
-                'isLogin': 1,
-                'uname': u['uname']
+                'isLogin': 1
             }
         else:
             result = {
