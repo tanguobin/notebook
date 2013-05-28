@@ -40,12 +40,12 @@ class UserHandler(BaseHandler):
         u = self.current_user
         result, code = [], 'E_OK'
         if u:
-            result = {
+            result = [{
                 'isLogin': 1
-            }
+            }]
         else:
-            result = {
+            result = [{
                 'isLogin': 0
-            }
+            }]
             code = 'E_AUTH'
         self.send_json(result, code)

@@ -53,11 +53,11 @@ class NotebookHandler(BaseHandler):
                 images = [self.application.settings['static_host']+image for image in note.images.split('&') if image]
                 title = note.title
                 content = note.content
-            result = {
+            result = [{
                 'title': title,
                 'content': content,
                 'images': images
-            }
+            }]
         except Exception,e:
             logger.exception("%s\n%s\n", self.request, e)
             code = 'E_PARAM'
@@ -80,15 +80,15 @@ class UpdateNoteHandler(BaseHandler):
                 ctrl.note.update_note(id=nid,uid=u['uid'],cid=cid,title=title,content=content)
                 note = ctrl.note.get_note_detail(nid)
                 if note:
-                    result = {
+                    result = [{
                         'time': note.uptime.strftime('%Y-%m-%d %H:%M:%S')
-                    }
+                    }]
             else:
                 note = ctrl.note.add_notebook(u['uid'],cid,title,content)
-                result = {
+                result = [{
                     'nid': note.id,
                     'time': note.uptime.strftime('%Y-%m-%d %H:%M:%S')
-                }
+                }]
         except Exception,e:
             logger.exception("%s\n%s\n", self.request, e)
             code = 'E_PARAM'
@@ -113,9 +113,9 @@ class UpdateCateHandler(BaseHandler):
                 ctrl.note.update_category(id=cid,uid=u['uid'],name=name)
             else:
                 category = ctrl.note.add_category(uid=u['uid'],names=[name])[0]
-                result = {
+                result = [{
                     'cid': category.id
-                }
+                }]
         except Exception,e:
             logger.exception("%s\n%s\n", self.request, e)
             code = 'E_INTER'
@@ -166,9 +166,9 @@ class ImageHandler(BaseHandler):
                 fopen.write(upload_file['body'])
                 fopen.close()
                 urllist.append(sign)
-            result = {
+            result = [{
                 'url': urllist
-            }
+            }]
             images = '&'.join(urllist)
             if images:
                 ctrl.note.update_note(id=nid,images=images)
