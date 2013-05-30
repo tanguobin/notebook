@@ -84,11 +84,13 @@ class UpdateNoteHandler(BaseHandler):
                         'time': note.uptime.strftime('%Y-%m-%d %H:%M:%S')
                     }]
             else:
-                note = ctrl.note.add_notebook(u['uid'],cid,title,content)
-                result = [{
-                    'nid': note.id,
-                    'time': note.uptime.strftime('%Y-%m-%d %H:%M:%S')
-                }]
+		note = ctrl.note.get_notebook(u['uid'],cid,title)
+		if not note:
+                    note = ctrl.note.add_notebook(u['uid'],cid,title,content)
+                    result = [{
+                        'nid': note.id,
+                        'time': note.uptime.strftime('%Y-%m-%d %H:%M:%S')
+                    }]
         except Exception,e:
             logger.exception("%s\n%s\n", self.request, e)
             code = 'E_PARAM'
@@ -112,10 +114,12 @@ class UpdateCateHandler(BaseHandler):
             if cid:
                 ctrl.note.update_category(id=cid,uid=u['uid'],name=name)
             else:
-                category = ctrl.note.add_category(uid=u['uid'],names=[name])[0]
-                result = [{
-                    'cid': category.id
-                }]
+		category = ctrl.note.get_category(uid=u['uid'],name=name)
+		if not category:
+                    category = ctrl.note.add_category(uid=u['uid'],names=[name])[0]
+                    result = [{
+                        'cid': category.id
+                    }]
         except Exception,e:
             logger.exception("%s\n%s\n", self.request, e)
             code = 'E_INTER'

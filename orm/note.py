@@ -64,6 +64,9 @@ class NoteModel(object):
         self.session.commit()
         return note
 
+    def get_notebook(self,uid=None,cid=None,title=None):
+        return self.session.query(Notebook).filter(Notebook.uid==uid,Notebook.cid==cid,Notebook.title==title).first()
+
     def update_note(self,id=None,**args):
         mapping = {
             'uid': Notebook.uid,
@@ -104,11 +107,14 @@ class NoteModel(object):
         self.session.commit()
         return catelist
 
-    def get_category(self,uid=None):
+    def get_category(self,uid=None,name=None):
         '''
         get user all category
         '''
-        return self.session.query(Category).filter(Category.uid==uid).all()
+	if name:
+            return self.session.query(Category).filter(Category.uid==uid,Category.name==name).first()
+	else:
+            return self.session.query(Category).filter(Category.uid==uid).all()
 
     def get_note_detail(self,nid=None):
         '''
