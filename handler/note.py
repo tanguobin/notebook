@@ -64,7 +64,7 @@ class NotebookHandler(BaseHandler):
         self.send_json(result, code)
 
 class UpdateNoteHandler(BaseHandler):
-    def get(self):
+    def post(self):
         result,code = [],'E_OK'
         u = self.current_user
         if not u:
