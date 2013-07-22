@@ -76,6 +76,11 @@ class UpdateNoteHandler(BaseHandler):
             cid = self.get_argument('cid')
             title = self.get_argument('title','')
             content = self.get_argument('content','')
+            cate = ctrl.note.get_category(cid=cid)
+            if not cate:
+                code = 'E_RESRC'
+                self.send_json(result,code)
+                return
             if nid:
                 ctrl.note.update_note(id=nid,uid=u['uid'],cid=cid,title=title,content=content)
                 note = ctrl.note.get_note_detail(nid)
@@ -113,6 +118,9 @@ class UpdateCateHandler(BaseHandler):
         try:
             if cid:
                 ctrl.note.update_category(id=cid,uid=u['uid'],name=name)
+                result = [{
+                    'cid': cid
+                }]
             else:
 		category = ctrl.note.get_category(uid=u['uid'],name=name)
 		if not category:

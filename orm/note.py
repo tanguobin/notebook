@@ -107,10 +107,12 @@ class NoteModel(object):
         self.session.commit()
         return catelist
 
-    def get_category(self,uid=None,name=None):
+    def get_category(self,uid=None,name=None,cid=None):
         '''
         get user all category
         '''
+	if cid:
+            return self.session.query(Category).filter(Category.cid==cid).first()
 	if name:
             return self.session.query(Category).filter(Category.uid==uid,Category.name==name).first()
 	else:
