@@ -4,6 +4,7 @@
 
 import os
 import sys
+import hashlib
 import tornado.web
 import tornado.httpserver
 import tornado.ioloop

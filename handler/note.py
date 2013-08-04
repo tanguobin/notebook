@@ -4,6 +4,8 @@
 
 import logging
 import hashlib
+import pyDes
+import binascii
 from handler.base import BaseHandler
 from control import ctrl
 
