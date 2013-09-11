@@ -16,8 +16,8 @@ class Ctrl(object):
         behaviors = {'tcp_nodelay':True,'ketama':True}
         self.session = pylibmc.Client(eval(session_server),binary=True,behaviors=behaviors)
         self.cache = pylibmc.Client(eval(cache_server),binary=True,behaviors=behaviors)
-        self.user = UserCtrl()
-        self.note = NoteCtrl()
+        self.user = UserCtrl(self)
+        self.note = NoteCtrl(self)
 
     @staticmethod
     def instance():

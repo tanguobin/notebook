@@ -4,8 +4,8 @@
 
 import logging
 import hashlib
-import pyDes
 import binascii
+import time
 from handler.base import BaseHandler
 from control import ctrl
 
@@ -55,10 +55,12 @@ class NotebookHandler(BaseHandler):
                 images = [self.application.settings['static_host']+image for image in note.images.split('&') if image]
                 title = note.title
                 content = note.content
+		t = time.mktime(note.uptime.timetuple())
             result = [{
                 'title': title,
                 'content': content,
-                'images': images
+                'images': images,
+		't': t
             }]
         except Exception,e:
             logger.exception("%s\n%s\n", self.request, e)

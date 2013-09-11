@@ -6,8 +6,9 @@ from orm.user import UserModel
 
 class UserCtrl(object):
 
-    def __init__(self):
+    def __init__(self, ctrl):
         self.user = UserModel()
+        self.cache = ctrl.cache
 
     def __getattr__(self, name):
         return getattr(self.user, name)
